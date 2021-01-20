@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ans="http://www.ans.gov.br/padroes/tiss/schemas" targetNamespace="http://www.ans.gov.br/padroes/tiss/schemas" elementFormDefault="qualified">
+	<!--RADAR TISS 2011 - radarPerguntas2012.xsd -->
+	<include schemaLocation="http://www.ans.gov.br/padroes/tiss/schemas/radarSimpleTypes2012.xsd"/>
+	<!--Pergunta 1: Distribuição do montante em reais relativo aos eventos de atenção à saúde por grupo de origem -->
+	<!--ocorridos de 01 à 31 de outubro de 2012.	-->
+	<complexType name="pergunta01">
+		<sequence>
+		    <element name="questao01" minOccurs="1"  maxOccurs="20">
+				<complexType>
+					<sequence>
+			           <element name="grupoEvento" type="ans:dm_grupoEvento"   />
+			           <element name="tpValorEvento" type="ans:dm_tpValorEvento"/>
+			           <element name="valorevento" type="ans:st_decimal12-2"    />
+			        </sequence>
+                </complexType>
+			</element>
+		</sequence>			          
+	</complexType>
+	<!--Pergunta 2:Distribuição do quantitativo e valor dos eventos de atenção à Saúde, por prestador de serviços de saúde	-->
+	<complexType name="pergunta02">
+		<sequence>
+			<element name="questao02" maxOccurs="unbounded">
+				<complexType>
+					<sequence>
+						<element name="tipoIdent" type="ans:dm_tipoIdent"/>
+						<element name="codIdent" type="ans:st_texto14"/>
+						<element name="codMunic" type="ans:st_texto7"/>
+						<element name="tipoGuia" type="ans:dm_tipoGuia"/>
+						<element name="qtdGuiasEletro" type="ans:st_numerico8"/>
+						<element name="qtdItensEletro" type="ans:st_numerico10"/>
+						<element name="valorEletro" type="ans:st_decimal12-2" />
+						<element name="qtdGuiasTotal" type="ans:st_numerico8"/>
+						<element name="qtdItensTotal" type="ans:st_numerico10"/>
+						<element name="valorTotal" type="ans:st_decimal12-2"/>
+						<element name="versaoTiss" type="ans:dm_versao" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+	<!--Pergunta 3 Quantidade de prestadores que utilizaram o método de verificação de beneficiário por tipo de atendimento 
+no período de 01 à 31 de outubro de 2012.	-->
+	<complexType name="pergunta03">
+		<sequence>
+		  <element name="questao03" minOccurs="1" maxOccurs="20">
+				<complexType>
+					<sequence>
+						<element name="verifElegibilidade" type="ans:dm_verifEleg"      />
+						<element name="grupoEvento"       type="ans:dm_grupoEvento"/>
+						<element name="qtdElegibilidade"  type="ans:st_numerico8">
+							<annotation>
+								<documentation>
+									Esta informação refere-se ao nº de prestadores que adotam o método de elegibilidade por grupo de eventos.
+								</documentation>
+							</annotation>	
+						</element>	
+					</sequence>
+				</complexType>
+			</element>		
+		</sequence>
+	</complexType>
+	<!--Pergunta 4: Informar se a troca eletrônica de informações entre a operadora e seus prestadores é realizada pela própria operadora	-->
+	<complexType name="pergunta04">
+		<sequence>
+			<element name="questao04" minOccurs="18" maxOccurs="18">
+				<complexType>
+					<sequence>		
+						<element name="msgEletronica" type="ans:dm_msgEletronica"/>
+						<element name="tpCanalMsg" type="ans:dm_tpCanalMsg"/>
+						<element name="elegibilidade" type="ans:dm_simNao"/>
+					</sequence>
+				</complexType>
+			</element>											
+		</sequence>
+	</complexType>
+	<!--Pergunta 5: Informar sobre implantação de certificado digital para o padrão TISS.-->
+	<complexType name="pergunta05">
+		<sequence>
+			<element name="possuiCertificado"      type="ans:dm_simNao"  />
+			<element name="nomeCertificado"       type="ans:st_texto20"  minOccurs="0"/>
+			<element name="qtdPrestadoresCertif" type="ans:st_numerico8" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	
+	<!--Pergunta 6: Forma de conectividade disponibilizada pela operadora aos seus prestadores e utilizada por estes-->
+	<complexType name="pergunta06">
+		<sequence>
+			<element name="questao06" minOccurs="6" maxOccurs="6">
+				<complexType>
+					<sequence>				
+						<element name="formAcesso" type="ans:dm_formAcesso"/>
+						<element name="implElegibilidade" type="ans:dm_simNao" />
+						<element name="qtdElegibilidade" type="ans:st_numerico8" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>											
+		</sequence>
+	</complexType>
+	<!--Pergunta 7: Comunicação da operadora com o beneficiário via site com login e senha.-->
+	<complexType name="pergunta07">
+		<sequence>
+		    <element name="possuiCanalLoginSenha" type="ans:dm_simNao">
+				<annotation><documentation>Disponibiliza ao beneficiário canal de acesso com login e senha?</documentation></annotation>
+			</element>
+			<element name="acessoDadosCadastrais" type="ans:dm_simNao" >
+				<annotation><documentation>Para acesso a dados cadastrais</documentation></annotation>
+			</element>
+			<element name="acessoRedePrestadores" type="ans:dm_simNao">
+				<annotation><documentation>Para acesso a rede de prestadores</documentation>
+				</annotation>
+			</element>
+			<element name="acessoDadosUtilizacao" type="ans:dm_simNao">
+				<annotation><documentation>Para acesso a dados de utilização de serviços</documentation></annotation>
+			</element>
+			<element name="acessoOutrosDados" type="ans:dm_simNao">
+				<annotation><documentation>Para acesso a outros dados ou serviços</documentation></annotation>
+			</element>
+		</sequence>
+	</complexType>
+	
+	<complexType name="pergunta08a10">
+		<sequence>
+			<!--Pergunta 8:Principais demandas para o Coordenador TISS	-->
+			<element name="principaisDemandas" type="ans:st_texto500" minOccurs="0"/>
+			<!--Pergunta 9:Principais dificuldades para a implantação do Padrão TISS	-->
+			<element name="principaisDificuldades" type="ans:st_texto500" minOccurs="0"/>
+			<!--Pergunta 10:Sugestões para melhoria do Padrão TISS-->
+			<element name="sugestoesMelhorias" type="ans:st_texto500" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<!--Pergunta 11:Responsável pelos dados informados nesta pesquisa-->
+	<complexType name="pergunta11" >
+		<sequence>
+			<element name="nomeResponsavel" type="ans:st_nome" minOccurs="1" maxOccurs="1"/>
+			<element name="cargoResponsavel" type="ans:st_cargo" minOccurs="1" maxOccurs="1"/>
+			<element name="telResponsavel" type="ans:st_telefone" minOccurs="1" maxOccurs="1"/>
+			<element name="emailResponsavel" type="ans:st_email" minOccurs="1" maxOccurs="1"/>
+		</sequence>
+	</complexType>
+</schema>
+6595

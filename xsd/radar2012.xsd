@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+		targetNamespace="http://www.ans.gov.br/padroes/tiss/schemas" 
+		xmlns:ans="http://www.ans.gov.br/padroes/tiss/schemas"
+		elementFormDefault="qualified">
+<!--RADAR 2011-->
+	<include schemaLocation="http://www.ans.gov.br/padroes/tiss/schemas/radarSimpleTypes2012.xsd"/>
+	<include schemaLocation="http://www.ans.gov.br/padroes/tiss/schemas/radarPerguntas2012.xsd"/>
+<!-- Estrutura da mensagem do radar TISS 2011 -->
+	<element name="mensagemRadar">
+		<complexType>
+			<sequence>
+				<element name="cabecalho" type="ans:cabecalhoTransacao"/>
+				<choice>
+					<element minOccurs="0" name="operadoraParaANS" type="ans:operadoraANS"/>
+					<element minOccurs="0" name="ansParaOperadora" type="ans:ansOperadora"/>
+				</choice>
+				<element name="epilogo" type="ans:epilogo"/>
+			</sequence>
+		</complexType>
+	</element>
+<!-- Definicao do cabecalho das mensagens -->
+	<complexType name="cabecalhoTransacao">
+		<sequence>
+			<element name="identificacaoTransacao">
+				<complexType>
+					<sequence>
+						<element name="tipoTransacao" type="ans:dm_tipoTransacao"/>
+						<element name="sequencialTransacao" type="ans:st_texto12"/>
+						<element name="dataRegistroTransacao" type="ans:st_data"/>
+						<element name="horaRegistroTransacao" type="ans:st_hora"/>
+					</sequence>
+				</complexType>
+			</element>
+<!--<element name="falhaNegocio" type="ans:dm_tipoGlosa" minOccurs="0"/>
+-->
+			<element name="origem">
+				<complexType>
+					<choice>
+						<element name="registroANS" type="ans:st_registroANS"/>
+						<element name="ANS" type="ans:st_ANS"/>
+					</choice>
+				</complexType>
+			</element>
+			<element name="destino">
+				<complexType>
+					<choice>
+						<element name="registroANS" type="ans:st_registroANS"/>
+						<element name="ANS" type="ans:st_ANS"/>
+					</choice>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+<!-- ************************************************ Mensagens da OPERADORA para a ANS ************** -->
+	<complexType name="operadoraANS">
+		<sequence>
+			<element name="pergunta1" type="ans:pergunta01"/>
+			<element name="pergunta2" type="ans:pergunta02"/>
+			<element name="pergunta3" type="ans:pergunta03"/>
+			<element name="pergunta4" type="ans:pergunta04"/>
+			<element name="pergunta5" type="ans:pergunta05"/>
+			<element name="pergunta6" type="ans:pergunta06"/>
+			<element name="pergunta7" type="ans:pergunta07"/>
+			<element name="pergunta8a10" type="ans:pergunta08a10"/>
+			<element name="pergunta11" type="ans:pergunta11"/>
+		</sequence>
+	</complexType>
+<!-- ************************************************ Mensagens da ANS para a OPERADORA ************** -->
+	<complexType name="ansOperadora">
+		<choice>
+			<element name="reciboPesquisa" type="ans:ct_recibo"/>
+			<element name="erroPesquisa" type="ans:ct_erro"/>
+		</choice>
+	</complexType>
+	<complexType name="epilogo">
+		<sequence>
+			<element name="hash" type="string"/>
+		</sequence>
+	</complexType>
+	<complexType name="ct_recibo">
+		<sequence>
+			<element name="registroANS" type="ans:st_registroANS"/>
+			<element name="dataRecebimento" type="ans:st_data"/>
+			<element name="horaRecebimento" type="ans:st_hora"/>
+			<element name="resultado" type="ans:st_texto20"/>
+		</sequence>
+	</complexType>
+	<complexType name="ct_erro">
+		<sequence>
+			<element name="registroANS" type="ans:st_registroANS"/>
+			<element name="dataEnvio" type="ans:st_data"/>
+			<element name="horaEnvio" type="ans:st_hora"/>
+			<element name="textoErro" type="ans:st_texto40"/>
+		</sequence>
+	</complexType>
+</schema>
+3700

@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ans="http://www.ans.gov.br/padroes/tiss/schemas/" targetNamespace="http://www.ans.gov.br/padroes/tiss/schemas" elementFormDefault="qualified">
+	<!--VERSÃO TISS 4.00.00 - TissSimpleTypesV4_00_00-->
+	<!-- Schema com os tipos simples de dados re-utilizados na construção dos tipos complexos -->
+	<!-- Questão 1: Grupo de eventos de atenção a saude -->
+	<!-- Questão 3: Grupo de eventos de atenção a saude -->
+	<simpleType name="dm_grupoEvento">
+		<restriction base="string">
+			<enumeration value="1"/>
+			<enumeration value="2"/>
+			<enumeration value="3"/>
+			<enumeration value="4"/>
+			<enumeration value="5"/>			
+			<!--	1	Consulta? padrão TISS
+	2	Atendimento ambulatorial? padrão TISS
+	3	Tratamento Odontologico ? padrão TISS
+	4	Diagnose e Terapia ? padrão TISS
+	5	Internacao ? padrão TISS-->
+		</restriction>
+	</simpleType>
+	<!--Questão 1: Tipos do Valores de Evento (de atenção a saude por oriem e exclusivamente com utilização da TUSS) -->
+	<simpleType name="dm_tpValorEvento">
+		<restriction base="string">
+			<enumeration value="1"/>
+			<enumeration value="2"/>
+			<enumeration value="3"/>
+			<enumeration value="4"/>
+		</restriction>
+		<!--1-Rede contratada / Credenciada-->
+		<!--2-Servico Proprio-->
+		<!--3-Reembolso e Outros-->
+		<!--4-Valor Exclusivamente com utilização da TUSS-->
+	</simpleType>
+	<simpleType name="dm_tipoTransacaoANS">
+		<restriction base="string">
+			<enumeration value="MONITORAMENTO"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="dm_tipoTransacao">
+		<restriction base="string">
+			<enumeration value="ENVIO_PESQUISA_RADAR"/>
+			<enumeration value="SUBSTITUI_PESQUISA_RADAR"/>
+			<enumeration value="PROTOCOLO_RECEBIMENTO"/>
+		</restriction>
+	</simpleType>	
+	<!-- Questão 2: Tipo de indetificador do Prestador -->
+	<simpleType name="dm_tipoIdent">
+		<restriction base="string">
+			<enumeration value="1"/>
+			<enumeration value="2"/>
+			<enumeration value="3"/>
+		</restriction>
+		<!--1-CPF-->
+		<!--2-CNPJ-->
+		<!--3-CNES-->
+	</simpleType>
+	<!-- Questão 2: Tipo de Guia -->
+	<simpleType name="dm_tipoGuia">
+		<restriction base="string">
+			<enumeration value="1"/>
+			<enumeration value="2"/>
+			<enumeration value="3"/>
+			<enumeration value="4"/>
+			<enumeration value="5"/>
+			<enumeration value="6"/>
+			<enumeration value="7"/>
+			<!--	1	Guia de consulta ? padrão TISS
+	2	Guia de SP/SADT ? padrão TISS
+	3	Guia de tratamento odontológico ? padrão TISS
+	4	Guia de resumo de internação ? padrão TISS
+	5	Guia de honorário individual ? padrão TISS
+	6	Guia de outras despesas ? padrão TISS
+	7	Outras guias fora do padrão TISS-->
+		</restriction>
+	</simpleType>
+		<!-- Questão 2: Versão do TISS -->
+	<simpleType name="dm_versao">
+		<restriction base="string">
+			<length value="5"/>
+			<enumeration value="10000"/>
+			<enumeration value="20000"/>
+			<enumeration value="20101"/>
+			<enumeration value="20102"/>
+			<enumeration value="20103"/>
+			<enumeration value="20201"/>
+			<enumeration value="20202"/>
+			<enumeration value="20203"/>
+			<enumeration value="30000"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="dm_simNao">
+		<restriction base="string">
+			<enumeration value="S"/>
+			<enumeration value="N"/>
+		</restriction>
+	</simpleType>
+	<!-- Questão 3: Métodos de verificação de elegibilidade -->
+	<simpleType name="dm_verifEleg">
+		<restriction base="string">
+			<enumeration value="1"/>
+			<enumeration value="2"/>
+			<enumeration value="3"/>
+			<enumeration value="4"/>
+		</restriction>
+		<!--1-Biometria-->
+		<!--2-Leitura de cartão magnetico-->
+		<!--3-Outros Metodos eletronicos-->
+		<!--4-Forma não eletronica-->
+	</simpleType>
+	<!-- Questão 4: Mensagens Eletrônicas -->
+	<simpleType name="dm_msgEletronica">
+		<restriction base="string">
+			<enumeration value="1"/>
+			<enumeration value="2"/>
+			<enumeration value="3"/>
+			<enumeration value="4"/>
+			<enumeration value="5"/>
+			<enumeration value="6"/>
+		</restriction>
+		<!--1-Elegibilidade do Beneficiario-->
+		<!--2-Solicitação de autorização-->
+		<!--3-Autorização para execução-->
+		<!--4-Envio de cobranças-->
+		<!--5-Envio de demonstrativos-->
+		<!--6-Envio de recursos de glosas-->
+	</simpleType>
+	<!-- Questão 4: Tipos de Canal para troca de mensagens eletrônicas -->
+	<simpleType name="dm_tpCanalMsg">
+		<restriction base="string">
+			<enumeration value="1"/>
+			<enumeration value="2"/>
+			<enumeration value="3"/>
+		</restriction>
+		<!--1-Próprio-->
+		<!--2-Terceirizado-->
+		<!--3-Entidade representativa-->
+	</simpleType>
+	<!-- Questão 6: Formas de Acesso -->
+	<simpleType name="dm_formAcesso">
+		<restriction base="string">
+			<enumeration value="1"/>
+			<enumeration value="2"/>
+			<enumeration value="3"/>
+			<enumeration value="4"/>
+			<enumeration value="5"/>
+			<enumeration value="6"/>
+		</restriction>
+		<!--1-Web Service para elegibilidade , solicitação e autorização de procedimentos-->
+		<!--2-Webservice para envio de cobranças-->
+		<!--3-Webservice para solicitação e envio de demonstrativos-->
+		<!--4-Portal para upload de arquivos com cobranças-->
+		<!--5-Portal para cadastramento de guias/cobranças-->
+		<!--6-Portal para solicitação e emissão de demonstrativos -->
+	</simpleType>
+	<simpleType name="st_ANS">
+		<restriction base="string">
+			<enumeration value="ANS"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_CNPJ">
+		<restriction base="string">
+			<pattern value="[0-9]{14}"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_CPF">
+		<restriction base="string">
+			<pattern value="[0-9]{11}"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_competencia">
+		<restriction base="string">
+			<pattern value="[0-9]{4}/[0-9]{2}"/>
+		</restriction>
+		<!--formato ano/mes -->
+	</simpleType>
+	<simpleType name="st_data">
+		<restriction base="date"/>
+	</simpleType>
+	<simpleType name="st_dataHora">
+		<restriction base="dateTime"/>
+	</simpleType>
+	<simpleType name="st_decimal4-2">
+		<restriction base="decimal">
+			<totalDigits value="4"/>
+			<fractionDigits value="2"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_decimal5-2">
+		<restriction base="decimal">
+			<totalDigits value="5"/>
+			<fractionDigits value="2"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_decimal8-2">
+		<restriction base="decimal">
+			<totalDigits value="8"/>
+			<fractionDigits value="2"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_decimal10-2">
+		<restriction base="decimal">
+			<fractionDigits value="2"/>
+			<totalDigits value="10"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_decimal12-2">
+		<restriction base="decimal">
+			<totalDigits value="12"/>
+			<fractionDigits value="2"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_hora">
+		<restriction base="time"/>
+	</simpleType>
+	<simpleType name="st_logico">
+		<restriction base="boolean"/>
+	</simpleType>
+	<simpleType name="st_numerico2">
+		<restriction base="integer">
+			<totalDigits value="2"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_numerico3">
+		<restriction base="integer">
+			<totalDigits value="3"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_numerico4">
+		<restriction base="integer">
+			<totalDigits value="4"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_numerico8">
+		<restriction base="integer">
+			<totalDigits value="8"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_numerico10">
+		<restriction base="integer">
+			<totalDigits value="10"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_registroANS">
+		<restriction base="string">
+			<maxLength value="6"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto4">
+		<restriction base="string">
+			<maxLength value="4"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto5">
+		<restriction base="string">
+			<maxLength value="5"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto6">
+		<restriction base="string">
+			<maxLength value="6"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto7">
+		<restriction base="string">
+			<maxLength value="7"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto8">
+		<restriction base="string">
+			<maxLength value="8"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto10">
+		<restriction base="string">
+			<maxLength value="10"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto12">
+		<restriction base="string">
+			<maxLength value="12"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto14">
+		<restriction base="string">
+			<maxLength value="14"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto15">
+		<restriction base="string">
+			<maxLength value="15"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto20">
+		<restriction base="string">
+			<maxLength value="20"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto40">
+		<restriction base="string">
+			<maxLength value="40"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto60">
+		<restriction base="string">
+			<maxLength value="60"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto70">
+		<restriction base="string">
+			<maxLength value="70"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto100">
+		<restriction base="string">
+			<maxLength value="100"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto150">
+		<restriction base="string">
+			<maxLength value="150"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto500">
+		<restriction base="string">
+			<maxLength value="500"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_texto1000">
+		<restriction base="string">
+			<maxLength value="1000"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="st_nome"> 
+		<restriction base="string">
+			<minLength value="4"/>
+			<maxLength value="60"/>
+			<pattern value="([A-ZÀ-Ü])([a-zA-ZÀ-Üà-ü]{2,})+( [a-zA-ZÀ-Üà-ü]+)+"/> 
+		</restriction> 
+    </simpleType>
+	<simpleType name="st_cargo"> 
+		<restriction base="string">
+			<minLength value="2"/>
+			<maxLength value="40"/>
+		</restriction> 
+    </simpleType> 
+	<simpleType name="st_telefone"> 
+		<restriction base="string">
+			<minLength value="4"/>
+			<maxLength value="14"/>
+			<pattern value="\(?\d{2}\)?[\s-]?\d{4,5}-?\d{4}"/> 
+		</restriction> 
+    </simpleType> 
+	<simpleType name="st_email"> 
+		<restriction base="string"> 
+			<minLength value="7"/>
+			<maxLength value="40"/>
+			<pattern value="([0-9a-zA-Z]+([_.-]?[0-9a-zA-Z]+)*@[0-9a-zA-Z]+[0-9,a-z,A-Z,.,-]*(.){1}[a-zA-Z]{2,4})+"/> 
+		</restriction> 
+    </simpleType> 
+
+</schema>
