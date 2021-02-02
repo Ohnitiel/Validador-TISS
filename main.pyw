@@ -189,13 +189,14 @@ class MainWidget(QWidget):
         if ANS == '346659':
             datas = doc.findall("//{*}dataExecucao")
             for data in datas:
-                hora_inicial = etree.Element(f"{ans_namespace}horaInicial")
-                hora_inicial.text = "07:00:00"
-                hora_final = etree.Element(f"{ans_namespace}horaFinal")
-                hora_final.text = "07:45:00"
                 parent = data.getparent()
-                parent.insert(parent.index(data) + 1, hora_final)
-                parent.insert(parent.index(data) + 1, hora_inicial)
+                if parent.find("{*}horaInicial") is None:
+                    hora_inicial = etree.Element(f"{ans_namespace}horaInicial")
+                    hora_inicial.text = "07:00:00"
+                    hora_final = etree.Element(f"{ans_namespace}horaFinal")
+                    hora_final.text = "07:45:00"
+                    parent.insert(parent.index(data) + 1, hora_final)
+                    parent.insert(parent.index(data) + 1, hora_inicial)
 
 
 

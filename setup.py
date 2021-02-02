@@ -12,13 +12,13 @@ executables = [
 
 setup(
     name='Validador TISS',
-    version='1.1',
+    version='1.1.1',
     description='Validador TISS personalizado Qualifisio',
     executables=executables,
     options={"build_exe": {
         "packages": ["multiprocessing"],
         "include_files": [('xsd', 'xsd')],
-        "build_exe": r"C:\Users\Qualifisio\Desktop\Validador TISS 2",
+        "build_exe": r"C:\Users\Qualifisio\Desktop\Validador TISS",
         "includes": "atexit",
     }},
 )
