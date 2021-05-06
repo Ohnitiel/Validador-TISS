@@ -1,4 +1,5 @@
 import sys
+import codecs
 import hashlib
 
 from PyQt5.QtWidgets import (QApplication, QGridLayout, QWidget,
@@ -117,6 +118,9 @@ class MainWidget(QWidget):
         except OSError:
             ErrorDialog(self)
             return
+        except XMLSyntaxError:
+            ErrorDialog(self)
+            return
 
         QApplication.setOverrideCursor(Qt.WaitCursor)
         root = doc.getroot()
@@ -145,6 +149,7 @@ class MainWidget(QWidget):
             _guia = doc.findall("//{*}guiaSP_SADT")
             tag_guia = "{*}identificacaoGuiaSADTSP/{*}numeroGuiaPrestador"
 
+        ANS = doc.find("//{*}registroANS").text
         for guia in _guia:
             n = guia.find(tag_guia).text
             _proc = guia.findall(
@@ -152,9 +157,15 @@ class MainWidget(QWidget):
                 "{*}procedimentoExecutado"
             )
             prev_proc = 0
+            data = None
             for proc in _proc:
                 if (proc == prev_proc) and (prev_proc in avaliacao):
                     self.validation.append(f"Guia {n}:Avaliação duplicada\n")
+                if (proc == prev_proc) and (ANS == "346659"):
+                    if data == proc.find("{*}dataExecucao").text:
+                        self.validation.append(f"Guia {n}:"
+                                               "Possível duplicidade\n")
+                data = proc.find("{*}dataExecucao").text
                 qtd = float(proc.find("{*}quantidadeExecutada").text)
                 unit = float(proc.find("{*}valorUnitario").text)
                 total = float(proc.find("{*}valorTotal").text)
@@ -184,7 +195,6 @@ class MainWidget(QWidget):
             QApplication.restoreOverrideCursor()
             return 0
 
-        ANS = doc.find("//{*}registroANS").text
         ans_namespace = "{http://www.ans.gov.br/padroes/tiss/schemas}"
         if ANS == '346659':
             datas = doc.findall("//{*}dataExecucao")
@@ -214,10 +224,12 @@ class MainWidget(QWidget):
                 "Hash incorreto corrigido!\n"
             )
             e.text = calchash
-            with open(self.parent.getFilePath(), "w") as f:
+            encoding = doc.docinfo.encoding
+            with codecs.open(self.parent.getFilePath(), "w",
+                      encoding=encoding) as f:
                 f.write(etree.tostring(doc, xml_declaration=True,
-                                       encoding=doc.docinfo.encoding).decode())
-
+                                       encoding=encoding) \
+                        .decode(encoding=encoding))
         self.validation.append("Validação concluída!")
         QApplication.restoreOverrideCursor()
 
@@ -244,3 +256,4 @@ if __name__ == '__main__':
     window = MainWindow(None, dropfile)
     window.show()
     app.exec_()
+    QApplication.restoreOverrideCursor()

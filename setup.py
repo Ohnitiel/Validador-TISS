@@ -18,7 +18,7 @@ setup(
     options={"build_exe": {
         "packages": ["multiprocessing"],
         "include_files": [('xsd', 'xsd')],
-        "build_exe": r"C:\Users\Qualifisio\Desktop\Validador TISS",
+        "build_exe": r"C:\Users\Qualifisio\Documents\Utilidades\Validador TISS",
         "includes": "atexit",
     }},
 )
