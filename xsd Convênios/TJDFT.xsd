@@ -7,7 +7,7 @@
 		<simpleType>
 			<restriction base="string">
 				<pattern value="[0-9]+"/>
-				<length value="16"/>
+				<length value="14"/>
 			</restriction>
 		</simpleType>
 	</element>
@@ -15,7 +15,7 @@
 		<simpleType>
 			<restriction base="string">
 				<pattern value="[0-9]+"/>
-				<minLength value="5" />
+				<minLength value="8" />
 			</restriction>
 		</simpleType>
 	</element>

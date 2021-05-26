@@ -1,8 +1,9 @@
+import os
 import sys
 import codecs
 import hashlib
 
-from PyQt5.QtWidgets import (QApplication, QGridLayout, QWidget,
+from PyQt5.QtWidgets import (QApplication, QGridLayout, QWidget, QComboBox,
                              QMainWindow, QStatusBar, QToolBar, QLineEdit,
                              QFileDialog, QLabel, QShortcut, QTextEdit,
                              QDialog, QVBoxLayout, QDialogButtonBox)
@@ -61,9 +62,17 @@ class MainWindow(QMainWindow):
 
     def _addWidgets(self):
         self._filepath = QLineEdit(self)
+        self._convenios = QComboBox(self)
+        self._populateComboBox()
 
         self._mainWidget = MainWidget(self)
         self.setCentralWidget(self._mainWidget)
+        
+    def _populateComboBox(self):
+        convenios = os.listdir('xsd Convênios/')
+        convenios = [x.split('.')[0] for x in convenios if x.endswith('.xsd')]
+        convenios = ["Selecionar"] + convenios
+        self._convenios.addItems(convenios)
 
     def _createStatusBar(self):
         self.status = QStatusBar()
@@ -77,6 +86,13 @@ class MainWindow(QMainWindow):
         tools.addAction('Selecionar', self.fileSelect)
         tools.addAction('Validar', self._mainWidget.validate)
         tools.addWidget(self._filepath)
+        tools2 = QToolBar()
+        self.addToolBarBreak()
+        self.addToolBar(tools2)
+        tools2.setMovable(False)
+        tools2.setContextMenuPolicy(Qt.ContextMenuPolicy.PreventContextMenu)
+        tools2.addWidget(QLabel('Convênio:'))
+        tools2.addWidget(self._convenios)
 
     def fileSelect(self):
         dlg = QFileDialog()
@@ -111,6 +127,25 @@ class MainWidget(QWidget):
         self.layout.addWidget(self.validation, 1, 0, 1, 2)
 
         self.setLayout(self.layout)
+        
+    def schemaValidation(self, doc, schema, versao, namespace, tag_guia):
+        for error in schema.error_log:
+            translated = error.message.replace(
+                "{http://www.ans.gov.br/padroes/tiss/schemas}", '')
+            if error.type != 1824 and "guia" in error.path:
+                if versao.startswith("3"):
+                    guia = error.path.split("/")[2:6]
+                else:
+                    guia = error.path.split("/")[2:7]
+                guia = "/" + "/".join(guia)
+                guia = doc.find(guia, namespaces=namespace)
+                guia = guia.find(tag_guia).text
+                self.validation.append(
+                    "Erro encontrado na linha %i (Guia: %s). %s\r\n"
+                    % (error.line, guia, translated)
+                    )
+            else:
+                self.validation.append(f"Erro: {translated}")
 
     def validate(self):
         try:
@@ -129,6 +164,12 @@ class MainWidget(QWidget):
         ans_namespace = {"ans": "http://www.ans.gov.br/padroes/tiss/schemas"}
         self.xmlversion.setText(f"Versão do XML identificada: {versao}")
         self.validation.setText("")
+        if versao.startswith("3"):
+            _guia = doc.findall("//{*}guiaSP-SADT")
+            tag_guia = "{*}cabecalhoGuia/{*}numeroGuiaPrestador"
+        else:
+            _guia = doc.findall("//{*}guiaSP_SADT")
+            tag_guia = "{*}identificacaoGuiaSADTSP/{*}numeroGuiaPrestador"
 
         try:
             schema_root = etree.parse("xsd/%s" % tiss_v)
@@ -141,13 +182,7 @@ class MainWidget(QWidget):
 
         schema = etree.XMLSchema(schema_root)
         schema.validate(doc)
-
-        if versao.startswith("3"):
-            _guia = doc.findall("//{*}guiaSP-SADT")
-            tag_guia = "{*}cabecalhoGuia/{*}numeroGuiaPrestador"
-        else:
-            _guia = doc.findall("//{*}guiaSP_SADT")
-            tag_guia = "{*}identificacaoGuiaSADTSP/{*}numeroGuiaPrestador"
+        self.schemaValidation(doc, schema, versao, ans_namespace, tag_guia)
 
         ANS = doc.find("//{*}registroANS").text
         for guia in _guia:
@@ -174,41 +209,30 @@ class MainWidget(QWidget):
                         f"Guia {n}:Valor total diferente do calculado\n"
                     )
                 prev_proc = proc
-
-        for error in schema.error_log:
-            if error.type != 1824:
-                translated = error.message.replace(
-                    "{http://www.ans.gov.br/padroes/tiss/schemas}", '')
-                if versao.startswith("3"):
-                    guia = error.path.split("/")[2:6]
-                else:
-                    guia = error.path.split("/")[2:7]
-                guia = "/" + "/".join(guia)
-                guia = doc.find(guia, namespaces=ans_namespace)
-                guia = guia.find(tag_guia).text
-                self.validation.append(
-                    "Erro encontrado na linha %i (Guia: %s). %s\r\n"
-                    % (error.line, guia, translated)
-                    )
-
-        if schema.error_log:
-            QApplication.restoreOverrideCursor()
-            return 0
-
-        ans_namespace = "{http://www.ans.gov.br/padroes/tiss/schemas}"
+                
+        if self.parent._convenios.currentIndex() != 0:
+            convenio = self.parent._convenios.currentText()
+            schema_root = etree.parse(f'xsd Convênios/{convenio}.xsd')
+            schema = etree.XMLSchema(schema_root)
+            schema.validate(doc)
+            self.schemaValidation(doc, schema, versao, ans_namespace, tag_guia)
+            
+                
         if ANS == '346659':
             datas = doc.findall("//{*}dataExecucao")
             for data in datas:
                 parent = data.getparent()
                 if parent.find("{*}horaInicial") is None:
-                    hora_inicial = etree.Element(f"{ans_namespace}horaInicial")
+                    hora_inicial = etree.Element(f"{ans_namespace['ans']}horaInicial")
                     hora_inicial.text = "07:00:00"
-                    hora_final = etree.Element(f"{ans_namespace}horaFinal")
+                    hora_final = etree.Element(f"{ans_namespace['ans']}horaFinal")
                     hora_final.text = "07:45:00"
                     parent.insert(parent.index(data) + 1, hora_final)
                     parent.insert(parent.index(data) + 1, hora_inicial)
 
-
+        # if schema.error_log:
+        #     QApplication.restoreOverrideCursor()
+        #     return 0
 
         docstr = ''
         for e in doc.iter():

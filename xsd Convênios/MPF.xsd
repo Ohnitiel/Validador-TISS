@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ans="http://www.ans.gov.br/padroes/tiss/schemas" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" targetNamespace="http://www.ans.gov.br/padroes/tiss/schemas" elementFormDefault="qualified">
+	<!--VERSAO TISS 3.03.02 - Mensagens do Padrao TISS-->
+	<import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<element name="mensagemTISS"/>
+	<element name="numeroCarteira">
+		<simpleType>
+			<restriction base="string">
+				<pattern value="1011[0-9]+"/>
+				<length value="14"/>
+			</restriction>
+		</simpleType>
+	</element>
+</schema>

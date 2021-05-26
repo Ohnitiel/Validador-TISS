@@ -5,22 +5,9 @@
 	<element name="mensagemTISS"/>
 	<element name="numeroCarteira">
 		<simpleType>
-			<restriction base="integer">
-				<pattern value="[0-9]{9}"/>
-			</restriction>
-		</simpleType>
-	</element>
-	<element name="senha">
-		<simpleType>
-			<restriction base="integer">
-				<pattern value="[0-9]{12}" />
-			</restriction>
-		</simpleType>
-	</element>
-	<element name="codigoPrestadorNaOperadora">
-		<simpleType>
-			<restriction base="integer">
-				<pattern value="10005900"/>
+			<restriction base="string">
+				<pattern value="1041[0-9]+"/>
+				<length value="14"/>
 			</restriction>
 		</simpleType>
 	</element>
