@@ -6,7 +6,7 @@
 	<element name="numeroCarteira">
 		<simpleType>
 			<restriction base="string">
-				<pattern value="1031[0-9]+"/>
+				<pattern value="1021[0-9]+"/>
 				<length value="14"/>
 			</restriction>
 		</simpleType>

@@ -12,9 +12,13 @@ from PyQt5.QtGui import QKeySequence
 
 from lxml import etree
 from lxml.etree import XMLSyntaxError
+from deep_translator import GoogleTranslator
+
 
 avaliacao = ['10102019', '00020010', '50000349', '50000144', '00010929',
              '60030070', '10101222', '90050215']
+
+convenios_senha = ['AMIL', 'CASSI', 'GAMA', 'SAÚDE BRB', 'SLAM']
 
 
 class MainWindow(QMainWindow):
@@ -67,7 +71,7 @@ class MainWindow(QMainWindow):
 
         self._mainWidget = MainWidget(self)
         self.setCentralWidget(self._mainWidget)
-        
+
     def _populateComboBox(self):
         convenios = os.listdir('xsd Convênios/')
         convenios = [x.split('.')[0] for x in convenios if x.endswith('.xsd')]
@@ -104,7 +108,11 @@ class MainWindow(QMainWindow):
         )
         if filepath[0]:
             self._filepath.setText(filepath[0])
-            self._mainWidget.validate()
+            try:
+                self._mainWidget.validate()
+            except Exception as e:
+                self._mainWidget.validation.clear()
+                self._mainWidget.validation.append(f'Erro: {e}')
 
     def getFilePath(self):
         return self._filepath.text()
@@ -120,6 +128,7 @@ class MainWidget(QWidget):
         self.validation = QTextEdit()
         self.validation.setReadOnly(True)
         self._addWidgets()
+        self.translator = GoogleTranslator(source='en', target='pt')
         self.show()
 
     def _addWidgets(self):
@@ -127,11 +136,12 @@ class MainWidget(QWidget):
         self.layout.addWidget(self.validation, 1, 0, 1, 2)
 
         self.setLayout(self.layout)
-        
+
     def schemaValidation(self, doc, schema, versao, namespace, tag_guia):
         for error in schema.error_log:
-            translated = error.message.replace(
+            msg = error.message.replace(
                 "{http://www.ans.gov.br/padroes/tiss/schemas}", '')
+            translated = self.translator.translate(msg)
             if error.type != 1824 and "guia" in error.path:
                 if versao.startswith("3"):
                     guia = error.path.split("/")[2:6]
@@ -139,13 +149,60 @@ class MainWidget(QWidget):
                     guia = error.path.split("/")[2:7]
                 guia = "/" + "/".join(guia)
                 guia = doc.find(guia, namespaces=namespace)
-                guia = guia.find(tag_guia).text
+                try:
+                    guia = guia.find(tag_guia).text
+                except AttributeError:
+                    guia = "Sem número de guia"
                 self.validation.append(
                     "Erro encontrado na linha %i (Guia: %s). %s\r\n"
                     % (error.line, guia, translated)
                     )
             else:
                 self.validation.append(f"Erro: {translated}")
+
+    def cassiValidation(self, doc, ans_namespace):
+        datas = doc.findall("//{*}dataExecucao")
+        for data in datas:
+            parent = data.getparent()
+            if parent.find("{*}horaInicial") is None:
+                hora_inicial = etree.Element(etree.QName(
+                    ans_namespace['ans'], 'horaInicial'))
+                hora_inicial.text = "07:00:00"
+                hora_final = etree.Element(etree.QName(
+                    ans_namespace['ans'], 'horaFinal'))
+                hora_final.text = "07:45:00"
+                parent.insert(parent.index(data) + 1, hora_final)
+                parent.insert(parent.index(data) + 1, hora_inicial)
+        return doc
+
+    def slamValidation(self, doc):
+        dados = doc.findall("//{*}dadosAutorizacao")
+        for dado in dados:
+            guia = dado.getparent().find("{*}cabecalhoGuia/{*}numeroGuiaPrestador")
+            if dado.find("{*}numeroGuiaOperadora") is None:
+                self.validation.append(f"{guia.text} sem número da guia na "
+                                       "operadora!")
+        return doc
+
+    def recursoGlosaValidation(self, doc):
+        guias = doc.findall("//{*}numeroGuiaOrigem")
+        oldGuia = guias[0]
+        oldOpc = oldGuia.getparent().find("{*}opcaoRecursoGuia")
+        guias = guias[1:]
+        for guia in guias:
+            if guia.text == oldGuia.text:
+                parent = guia.getparent()
+                opc = parent.find("{*}opcaoRecursoGuia")
+                item = opc.find("{*}itensGuia")
+                opc.remove(item)
+                oldOpc.append(item)
+                parent.getparent().remove(parent)
+            else:
+                oldGuia = guia
+                oldOpc = guia.getparent().find("{*}opcaoRecursoGuia")
+                continue
+        return doc
+
 
     def validate(self):
         try:
@@ -180,13 +237,24 @@ class MainWidget(QWidget):
             QApplication.restoreOverrideCursor()
             return
 
+        if self.parent._convenios.currentText() == 'TST':
+            cdTables = doc.findall("//{*}codigoTabela")
+            for i in cdTables:
+                i.text = '22'
+
+        if doc.find("//{*}tipoTransacao").text == "RECURSO_GLOSA":
+           doc = self.recursoGlosaValidation(doc)
+
         schema = etree.XMLSchema(schema_root)
         schema.validate(doc)
         self.schemaValidation(doc, schema, versao, ans_namespace, tag_guia)
 
         ANS = doc.find("//{*}registroANS").text
         for guia in _guia:
-            n = guia.find(tag_guia).text
+            try:
+                n = guia.find(tag_guia).text
+            except AttributeError:
+                n = 'Sem número de guia'
             _proc = guia.findall(
                 "{*}procedimentosExecutados/"
                 "{*}procedimentoExecutado"
@@ -209,30 +277,28 @@ class MainWidget(QWidget):
                         f"Guia {n}:Valor total diferente do calculado\n"
                     )
                 prev_proc = proc
-                
+
         if self.parent._convenios.currentIndex() != 0:
             convenio = self.parent._convenios.currentText()
             schema_root = etree.parse(f'xsd Convênios/{convenio}.xsd')
             schema = etree.XMLSchema(schema_root)
             schema.validate(doc)
             self.schemaValidation(doc, schema, versao, ans_namespace, tag_guia)
-            
-                
-        if ANS == '346659':
-            datas = doc.findall("//{*}dataExecucao")
-            for data in datas:
-                parent = data.getparent()
-                if parent.find("{*}horaInicial") is None:
-                    hora_inicial = etree.Element(f"{ans_namespace['ans']}horaInicial")
-                    hora_inicial.text = "07:00:00"
-                    hora_final = etree.Element(f"{ans_namespace['ans']}horaFinal")
-                    hora_final.text = "07:45:00"
-                    parent.insert(parent.index(data) + 1, hora_final)
-                    parent.insert(parent.index(data) + 1, hora_inicial)
 
-        # if schema.error_log:
-        #     QApplication.restoreOverrideCursor()
-        #     return 0
+
+        if ANS == '346659':
+            doc = self.cassiValidation(doc, ans_namespace)
+        if ANS == '358509':
+            doc = self.slamValidation(doc)
+
+        if self.parent._convenios.currentText() in convenios_senha:
+            guias = doc.findall("//{*}guiaSP-SADT")
+            for guia in guias:
+                guia_n = guia.find("{*}cabecalhoGuia/{*}numeroGuiaPrestador").text
+                try:
+                    guia.find("{*}dadosAutorizacao/{*}senha").text
+                except AttributeError:
+                    self.validation.append(f"Guia Nº {guia_n} sem senha!\n")
 
         docstr = ''
         for e in doc.iter():
